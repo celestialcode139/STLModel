@@ -5,10 +5,13 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import * as dat from 'dat.gui'
 
+
 // Variables
 var STL_loader = new STLLoader();
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
+// var BGFolder = gui.addFolder('BG Controls');
+
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -17,16 +20,24 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 //STL Model
-STL_loader.load('Model/model.stl', function (geometry) {
-    var material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 });
+STL_loader.load('https://cdn.jsdelivr.net/gh/celestialcode139/STLModel@0.0.1/src/Model/model.stl', function (geometry) {
+    const material = new THREE.MeshPhongMaterial({ color: "gray", specular: "gray", shininess: 40 });
     var mesh = new THREE.Mesh(geometry, material);
     console.log(mesh);
     scene.add(mesh);
+    mesh.scale.set(0.04, 0.04, 0.04)
+    mesh.position.x = -3;
+
+    // Get the bounding box
+    const boundingBox = new THREE.Box3().setFromObject(mesh);
+    // Get dimensions
+    const dimensions = boundingBox.getSize(new THREE.Vector3());
+    console.log('Model Dimensions:', dimensions.x, dimensions.y, dimensions.z);
 });
 
 
 // Objects
-const geometry = new THREE.TorusGeometry(.7, .2, 16, 100);
+const geometry = new THREE.BoxGeometry(.1, .1, .1);
 
 // Materials
 
@@ -38,11 +49,15 @@ const sphere = new THREE.Mesh(geometry, material)
 // scene.add(sphere)
 
 // Lights
-const pointLight = new THREE.PointLight(0xffffff, 0.1)
-pointLight.position.x = 2
-pointLight.position.y = 3
-pointLight.position.z = 4
-scene.add(pointLight)
+const pointLight = new THREE.PointLight(0xffffff, 0.1);
+const pointLightBack = new THREE.PointLight(0xffffff, 0.1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const pointLightHelper = new THREE.PointLightHelper(pointLightBack, 1);
+
+pointLight.position.set(2,2,4);
+pointLightBack.position.set(2,2,-4);
+
+scene.add(pointLight, ambientLight, pointLightBack)
 
 /**
  * Sizes
@@ -68,9 +83,7 @@ window.addEventListener('resize', () => {
  */
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 0
-camera.position.y = 0
-camera.position.z = 2
+camera.position.z = 10
 scene.add(camera)
 
 /**
@@ -83,7 +96,8 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -101,3 +115,10 @@ const tick = () => {
 }
 
 tick()
+
+/**
+ * Axes Helper
+ */
+// var axesHelper = new THREE.AxesHelper(25);
+// gui.add(axesHelper, 'visible').name('visible');
+// scene.add(axesHelper);
