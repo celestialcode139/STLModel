@@ -1,13 +1,13 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import * as dat from 'dat.gui'
 
 
 // Variables
-var STL_loader = new STLLoader();
+var GLTF_loader = new GLTFLoader();
 // Debug
 // const gui = new dat.GUI()
 // var BGFolder = gui.addFolder('BG Controls');
@@ -20,19 +20,12 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 //STL Model
-STL_loader.load('https://cdn.jsdelivr.net/gh/celestialcode139/STLModel@0.0.1/src/Model/model.stl', function (geometry) {
-    const material = new THREE.MeshPhongMaterial({ color: "gray", specular: "gray", shininess: 40 });
-    var mesh = new THREE.Mesh(geometry, material);
-    console.log(mesh);
-    scene.add(mesh);
-    mesh.scale.set(0.04, 0.04, 0.04)
-    mesh.position.x = -3;
+var loader = new THREE.GLTFLoader();
 
-    // Get the bounding box
-    const boundingBox = new THREE.Box3().setFromObject(mesh);
-    // Get dimensions
-    const dimensions = boundingBox.getSize(new THREE.Vector3());
-    console.log('Model Dimensions:', dimensions.x, dimensions.y, dimensions.z);
+loader.load('https://cdn.jsdelivr.net/gh/celestialcode139/STLModel@0.0.3/src/Model/M-50-150.glb', function (gltf) {
+    const model = gltf.scene;
+    console.log("model", model);
+    scene.add(model)
 });
 
 
@@ -54,8 +47,8 @@ const pointLightBack = new THREE.PointLight(0xffffff, 0.1);
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 const pointLightHelper = new THREE.PointLightHelper(pointLightBack, 1);
 
-pointLight.position.set(2,2,4);
-pointLightBack.position.set(2,2,-4);
+pointLight.position.set(2, 2, 4);
+pointLightBack.position.set(2, 2, -4);
 
 scene.add(pointLight, ambientLight, pointLightBack)
 
